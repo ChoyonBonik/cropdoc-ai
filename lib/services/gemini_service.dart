@@ -27,20 +27,27 @@ class GeminiDiseaseService {
       debugPrint('[GeminiService] Image size: ${imageBytes.length} bytes, type: $mimeType');
 
       const prompt =
-          'You are an expert agricultural plant pathologist and agronomist specializing in tomato crops. '
-          'Carefully inspect this tomato leaf image:\n'
-          '1. Identify the disease or issue (e.g., Early Blight, Late Blight, Septoria Leaf Spot, Tomato Yellow Leaf Curl Virus, Bacterial Spot, or Healthy).\n'
-          '2. State your confidence level and the primary visual symptoms observed.\n'
-          '3. Provide an actionable, concise treatment and management plan (including organic/cultural controls and chemical treatments if applicable).\n'
-          '4. Provide preventive measures for future crops.\n\n'
-          'Format your response cleanly with clear headings and bullet points.';
+          'Perform a meticulous plant pathology examination of this leaf image:\n\n'
+          '## 1. PRIMARY DIAGNOSIS\n'
+          '- **Disease / Condition**: [Specify exact common name and scientific name, e.g., Early Blight (Alternaria solani), Late Blight (Phytophthora infestans), Septoria Leaf Spot (Septoria lycopersici), Bacterial Spot (Xanthomonas), Tomato Yellow Leaf Curl Virus, Leaf Mold, Powdery Mildew, or Healthy Leaf]\n'
+          '- **Severity Level**: [Healthy / Mild / Moderate / Critical]\n'
+          '- **Confidence Score**: [e.g., 95%]\n\n'
+          '## 2. OBSERVED PATHOLOGY & SYMPTOMS\n'
+          '- Detail the visual symptoms: spot shapes, colors, concentric target rings, chlorotic yellow halos, margins, or curling.\n'
+          '- Explain the key diagnostic features differentiating this from similar lookalikes.\n\n'
+          '## 3. IMMEDIATE TREATMENT PLAN\n'
+          '- **Cultural & Organic Remedies**: (Pruning infected tissue, drip irrigation, sunlight/airflow).\n'
+          '- **Chemical & Fungicidal Interventions**: (Specific active ingredients: e.g. Copper hydroxide, Chlorothalonil, Mancozeb, Azoxystrobin, or Bacillus subtilis).\n\n'
+          '## 4. PREVENTIVE MEASURES\n'
+          '- Long-term sanitation, crop rotation, and preventative care to protect remaining yield.\n\n'
+          'Format with clear markdown headings and bullet points.';
 
       const configuredModel = String.fromEnvironment('GEMINI_MODEL');
       final candidateModels = [
         if (configuredModel.isNotEmpty) configuredModel,
-        'gemini-3.8-flash',
         'gemini-3.5-flash',
-        'gemini-1.5-flash',
+        'gemini-3.5-flash-lite',
+        'gemini-3.8-flash',
       ];
 
       String? lastError;
@@ -51,6 +58,17 @@ class GeminiDiseaseService {
           final model = GenerativeModel(
             model: modelName,
             apiKey: apiKey,
+            systemInstruction: Content.system(
+              'You are a senior plant pathologist and agricultural disease expert. '
+              'Your mission is to accurately diagnose plant foliar diseases from imagery. '
+              'Inspect every quadrant of the leaf blade for subtle lesions, fungal spores, '
+              'chlorotic halos, necrotic margins, water-soaked patches, leaf curling, or viral mosaics. '
+              'Never overlook minor lesions or assume a leaf is healthy if any abnormal foliar symptoms are visible.'
+            ),
+            generationConfig: GenerationConfig(
+              maxOutputTokens: 1000,
+              temperature: 0.2,
+            ),
           );
 
           final promptPart = TextPart(prompt);

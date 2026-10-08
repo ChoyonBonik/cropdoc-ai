@@ -34,6 +34,7 @@ class _DiagnosisReportViewState extends State<DiagnosisReportView>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late DiseaseSeverity _severity;
+  late String _diseaseTitle;
   late List<String> _checklistItems;
   final Map<int, bool> _completedItems = {};
   final ScrollController _reportScrollController = ScrollController();
@@ -43,6 +44,7 @@ class _DiagnosisReportViewState extends State<DiagnosisReportView>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _severity = _determineSeverity(widget.diagnosisText);
+    _diseaseTitle = _extractDiseaseTitle(widget.diagnosisText);
     _checklistItems = _extractChecklistItems(widget.diagnosisText);
   }
 
@@ -52,6 +54,7 @@ class _DiagnosisReportViewState extends State<DiagnosisReportView>
     if (oldWidget.diagnosisText != widget.diagnosisText) {
       setState(() {
         _severity = _determineSeverity(widget.diagnosisText);
+        _diseaseTitle = _extractDiseaseTitle(widget.diagnosisText);
         _checklistItems = _extractChecklistItems(widget.diagnosisText);
         _completedItems.clear();
       });
@@ -65,23 +68,85 @@ class _DiagnosisReportViewState extends State<DiagnosisReportView>
     super.dispose();
   }
 
-  DiseaseSeverity _determineSeverity(String text) {
-    final lower = text.toLowerCase();
-    if (lower.contains('healthy') &&
-        !lower.contains('not healthy') &&
-        !lower.contains('blight') &&
-        !lower.contains('spot') &&
-        !lower.contains('virus')) {
-      return DiseaseSeverity.healthy;
+  String _extractDiseaseTitle(String text) {
+    final lines = text.split('\n');
+    for (final rawLine in lines) {
+      final line = rawLine.trim();
+      final lower = line.toLowerCase();
+
+      if (lower.contains('disease') ||
+          lower.contains('condition') ||
+          lower.contains('diagnosis:')) {
+        final clean = line
+            .replaceAll(RegExp(r'^[#\-*•\s]+'), '')
+            .replaceAll('**', '')
+            .replaceFirst(
+              RegExp(
+                r'^(Disease|Condition|Primary Diagnosis|Diagnosis)(\s*\/\s*Condition)?:\s*',
+                caseSensitive: false,
+              ),
+              '',
+            )
+            .trim();
+        if (clean.isNotEmpty && clean.length > 3) {
+          return clean;
+        }
+      }
     }
 
-    if (lower.contains('late blight') ||
-        lower.contains('yellow leaf curl') ||
-        lower.contains('bacterial wilt') ||
-        lower.contains('severe') ||
-        lower.contains('critical') ||
-        lower.contains('destroy')) {
-      return DiseaseSeverity.severe;
+    for (final rawLine in lines) {
+      final line = rawLine.trim();
+      if (line.startsWith('#')) {
+        final clean = line
+            .replaceFirst(RegExp(r'^#+\s*'), '')
+            .replaceAll('**', '')
+            .trim();
+        if (clean.isNotEmpty &&
+            !clean.toLowerCase().contains('report') &&
+            !clean.toLowerCase().contains('clinical')) {
+          return clean;
+        }
+      }
+    }
+
+    return _severity.label;
+  }
+
+  DiseaseSeverity _determineSeverity(String text) {
+    final lower = text.toLowerCase();
+    final topSection = lower.length > 500 ? lower.substring(0, 500) : lower;
+
+    final isSevere = topSection.contains('late blight') ||
+        topSection.contains('yellow leaf curl') ||
+        topSection.contains('bacterial wilt') ||
+        topSection.contains('canker') ||
+        topSection.contains('severe') ||
+        topSection.contains('critical');
+
+    if (isSevere) return DiseaseSeverity.severe;
+
+    final hasDisease = topSection.contains('blight') ||
+        topSection.contains('spot') ||
+        topSection.contains('speck') ||
+        topSection.contains('mold') ||
+        topSection.contains('mildew') ||
+        topSection.contains('virus') ||
+        topSection.contains('wilt') ||
+        topSection.contains('rot') ||
+        topSection.contains('mosaic') ||
+        topSection.contains('chlorosis') ||
+        topSection.contains('deficiency') ||
+        topSection.contains('mite') ||
+        topSection.contains('anthracnose') ||
+        topSection.contains('septoria') ||
+        topSection.contains('fung');
+
+    if (hasDisease) return DiseaseSeverity.moderate;
+
+    if (topSection.contains('healthy') &&
+        !topSection.contains('not healthy') &&
+        !topSection.contains('unhealthy')) {
+      return DiseaseSeverity.healthy;
     }
 
     return DiseaseSeverity.moderate;
@@ -248,23 +313,39 @@ class _DiagnosisReportViewState extends State<DiagnosisReportView>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'AI DIAGNOSIS RESULT',
-                  style: TextStyle(
-                    fontSize: 11,
-                    letterSpacing: 1.1,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black54,
-                  ),
-                ),
-                const SizedBox(height: 2),
                 Text(
-                  _severity.label,
+                  _diseaseTitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 16.5,
                     fontWeight: FontWeight.bold,
                     color: _severity.color.shade900,
                   ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 7,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _severity.color.shade200,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        _severity.label.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          letterSpacing: 0.6,
+                          fontWeight: FontWeight.bold,
+                          color: _severity.color.shade900,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

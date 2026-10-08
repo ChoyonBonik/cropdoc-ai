@@ -33,7 +33,7 @@ void main() {
       ),
     );
 
-    expect(find.text('AI DIAGNOSIS RESULT'), findsOneWidget);
+    expect(find.text('Early Blight (Alternaria solani)'), findsOneWidget);
     expect(find.text('Clinical Report'), findsOneWidget);
     expect(find.text('Action Checklist'), findsOneWidget);
 

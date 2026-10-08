@@ -25,9 +25,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       debugPrint('[LeafDoctor] Opening image picker: $source');
       final XFile? pickedFile = await _picker.pickImage(
         source: source,
-        maxWidth: 1600,
-        maxHeight: 1600,
-        imageQuality: 85,
+        maxWidth: 1200,
+        maxHeight: 1200,
+        imageQuality: 82,
       );
 
       if (pickedFile == null) {
