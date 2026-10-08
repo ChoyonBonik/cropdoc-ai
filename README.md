@@ -1,16 +1,16 @@
-# Tomato Leaf Doctor 🍅🍃
+# CropDoc AI 🌿🩺
 
-An intelligent Flutter mobile application for detecting tomato plant leaf diseases using Google's Gemini Vision API. Designed for farmers, agronomists, and home gardeners to diagnose plant pathogens and receive immediate, actionable treatment plans.
+**CropDoc AI: Plant Disease Doctor** — An intelligent Flutter mobile application for rapid diagnosis of crop and plant leaf diseases powered by Google's Gemini Vision API. Built for farmers, agricultural officers, and growers to identify pathogens early and receive actionable, structured treatment plans.
 
 ---
 
-## 🌟 Features
+## 🌟 Key Features
 
-- **Instant Diagnosis:** Capture live plant leaf photos via camera or select existing photos from the gallery.
-- **Multimodal AI Pathology:** Powered by Gemini Vision models with automatic fallback resilience (`gemini-3.8-flash` & `gemini-3.5-flash`).
-- **Actionable Treatment Plans:** Delivers comprehensive reports including pathogen identification, visual symptoms, confidence level, organic/cultural controls, and chemical treatments.
-- **Resilient Error Handling:** Built-in mitigation for API rate limits (HTTP 429), offline conditions, and endpoint versioning.
-- **Material 3 Design:** Clean, modern interface optimized for mobile workflows.
+- 📸 **Instant Scan & Diagnose:** Capture live photos using the camera or select existing leaf images from the device gallery.
+- 🧠 **Gemini Multimodal AI:** Powered by the latest Gemini Flash vision models (`gemini-3.8-flash` with automatic fallback to `gemini-3.5-flash`).
+- 💊 **Actionable Treatment Plans:** Delivers precise diagnosis, confidence levels, visual symptoms, organic/cultural controls, chemical remedies, and prevention tips.
+- 🛡️ **Resilient Architecture:** Automatic rate-limit (HTTP 429) backoff handling, endpoint version migration resilience, and offline/network failure recovery.
+- 🎨 **Modern Material 3 UI:** Clean, intuitive interface optimized for high visibility outdoors and single-handed mobile use.
 
 ---
 
@@ -24,8 +24,8 @@ An intelligent Flutter mobile application for detecting tomato plant leaf diseas
 ### 1. Clone the Repository
 
 ```bash
-git clone git@github.com:ChoyonBonik/gemini_disease_detector.git
-cd gemini_disease_detector
+git clone git@github.com:ChoyonBonik/cropdoc-ai.git
+cd cropdoc-ai
 ```
 
 ### 2. Install Dependencies
@@ -36,7 +36,7 @@ flutter pub get
 
 ### 3. Configure API Key
 
-Copy `keys.json.example` to `keys.json` (this file is excluded from git):
+Copy the example keys configuration (the real `keys.json` is protected and ignored by Git):
 
 ```bash
 cp keys.json.example keys.json
@@ -49,7 +49,7 @@ Add your Gemini API key in `keys.json`:
 }
 ```
 
-### 4. Run the App
+### 4. Run the Application
 
 Run on your connected Android or iOS device:
 
@@ -57,7 +57,7 @@ Run on your connected Android or iOS device:
 flutter run --dart-define-from-file=keys.json
 ```
 
-Alternatively, supply the key directly in the command line:
+Or pass the key directly:
 
 ```bash
 flutter run --dart-define=GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
@@ -65,19 +65,19 @@ flutter run --dart-define=GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
 
 ---
 
-## 📁 Project Structure
+## 📁 Architecture & Structure
 
 ```text
 lib/
-├── main.dart                      # Application entry point & theme configuration
+├── main.dart                      # CropDocApp initialization & theme setup
 ├── screens/
-│   └── dashboard_screen.dart      # Primary dashboard UI & image picking workflow
+│   └── dashboard_screen.dart      # Main dashboard, camera/gallery picker & report UI
 └── services/
-    └── gemini_service.dart        # Gemini Vision AI service & error resilience
+    └── gemini_service.dart        # Gemini Vision integration, multi-model fallback & error recovery
 ```
 
 ---
 
-## 🛡️ License
+## 📄 License
 
 This project is licensed under the MIT License.

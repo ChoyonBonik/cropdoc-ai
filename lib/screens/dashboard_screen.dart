@@ -148,9 +148,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         title: const Row(
           children: [
-            Icon(Icons.eco, color: Colors.green),
+            Icon(Icons.local_hospital_outlined, color: Colors.green),
             SizedBox(width: 8),
-            Text('Tomato Leaf Doctor'),
+            Text(
+              'CropDoc AI',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ],
         ),
         actions: [

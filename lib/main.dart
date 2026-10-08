@@ -3,20 +3,20 @@ import 'screens/dashboard_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const TomatoDiseaseDetectorApp());
+  runApp(const CropDocApp());
 }
 
-class TomatoDiseaseDetectorApp extends StatelessWidget {
-  const TomatoDiseaseDetectorApp({super.key});
+class CropDocApp extends StatelessWidget {
+  const CropDocApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tomato Disease Detector',
+      title: 'CropDoc AI',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.green,
+          seedColor: const Color(0xFF2E7D32), // Emerald Forest Green
           brightness: Brightness.light,
         ),
         useMaterial3: true,
