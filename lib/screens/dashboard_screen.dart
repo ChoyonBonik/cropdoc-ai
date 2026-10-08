@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../services/gemini_service.dart';
+import '../widgets/diagnosis_report_view.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -339,39 +340,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
 
     if (_diagnosisResult != null) {
-      return Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.medical_services_outlined,
-                      color: Colors.green.shade700),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'AI Diagnostic Report',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              const Divider(height: 24),
-              SelectableText(
-                _diagnosisResult!,
-                style: const TextStyle(
-                  fontSize: 14.5,
-                  height: 1.5,
-                ),
-              ),
-            ],
-          ),
-        ),
+      return DiagnosisReportView(
+        diagnosisText: _diagnosisResult!,
+        onScanAgain: _showImageSourceDialog,
       );
     }
 
