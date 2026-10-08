@@ -26,49 +26,7 @@ class DiagnosisReportView extends StatefulWidget {
     this.tabContentHeight = 400,
   });
 
-  @override
-  State<DiagnosisReportView> createState() => _DiagnosisReportViewState();
-}
-
-class _DiagnosisReportViewState extends State<DiagnosisReportView>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  late DiseaseSeverity _severity;
-  late String _diseaseTitle;
-  late List<String> _checklistItems;
-  final Map<int, bool> _completedItems = {};
-  final ScrollController _reportScrollController = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _severity = _determineSeverity(widget.diagnosisText);
-    _diseaseTitle = _extractDiseaseTitle(widget.diagnosisText);
-    _checklistItems = _extractChecklistItems(widget.diagnosisText);
-  }
-
-  @override
-  void didUpdateWidget(covariant DiagnosisReportView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.diagnosisText != widget.diagnosisText) {
-      setState(() {
-        _severity = _determineSeverity(widget.diagnosisText);
-        _diseaseTitle = _extractDiseaseTitle(widget.diagnosisText);
-        _checklistItems = _extractChecklistItems(widget.diagnosisText);
-        _completedItems.clear();
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    _reportScrollController.dispose();
-    super.dispose();
-  }
-
-  String _extractDiseaseTitle(String text) {
+  static String extractDiseaseTitle(String text) {
     final lines = text.split('\n');
     for (final rawLine in lines) {
       final line = rawLine.trim();
@@ -109,10 +67,11 @@ class _DiagnosisReportViewState extends State<DiagnosisReportView>
       }
     }
 
-    return _severity.label;
+    final severity = determineSeverity(text);
+    return severity.label;
   }
 
-  DiseaseSeverity _determineSeverity(String text) {
+  static DiseaseSeverity determineSeverity(String text) {
     final lower = text.toLowerCase();
     final topSection = lower.length > 500 ? lower.substring(0, 500) : lower;
 
@@ -150,6 +109,49 @@ class _DiagnosisReportViewState extends State<DiagnosisReportView>
     }
 
     return DiseaseSeverity.moderate;
+  }
+
+  @override
+  State<DiagnosisReportView> createState() => _DiagnosisReportViewState();
+}
+
+class _DiagnosisReportViewState extends State<DiagnosisReportView>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  late DiseaseSeverity _severity;
+  late String _diseaseTitle;
+  late List<String> _checklistItems;
+  final Map<int, bool> _completedItems = {};
+  final ScrollController _reportScrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _severity = DiagnosisReportView.determineSeverity(widget.diagnosisText);
+    _diseaseTitle = DiagnosisReportView.extractDiseaseTitle(widget.diagnosisText);
+    _checklistItems = _extractChecklistItems(widget.diagnosisText);
+  }
+
+  @override
+  void didUpdateWidget(covariant DiagnosisReportView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.diagnosisText != widget.diagnosisText) {
+      setState(() {
+        _severity = DiagnosisReportView.determineSeverity(widget.diagnosisText);
+        _diseaseTitle =
+            DiagnosisReportView.extractDiseaseTitle(widget.diagnosisText);
+        _checklistItems = _extractChecklistItems(widget.diagnosisText);
+        _completedItems.clear();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _reportScrollController.dispose();
+    super.dispose();
   }
 
   List<String> _extractChecklistItems(String text) {

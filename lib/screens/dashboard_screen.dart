@@ -2,7 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../services/gemini_service.dart';
+import '../services/history_service.dart';
 import '../widgets/diagnosis_report_view.dart';
+import 'history_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -13,6 +15,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final GeminiDiseaseService _diseaseService = GeminiDiseaseService();
+  final HistoryService _historyService = HistoryService();
   final ImagePicker _picker = ImagePicker();
 
   File? _selectedImage;
@@ -54,6 +57,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _diagnosisResult = result;
       });
       debugPrint('[LeafDoctor] Analysis complete.');
+
+      // Save to offline history if result is a valid diagnosis
+      if (!result.startsWith('Error:') &&
+          !result.startsWith('Rate Limit Exceeded') &&
+          !result.startsWith('Network Error') &&
+          !result.startsWith('Gemini AI Error:')) {
+        final title = DiagnosisReportView.extractDiseaseTitle(result);
+        final severity = DiagnosisReportView.determineSeverity(result).name;
+        _historyService.saveScan(
+          imageFile: file,
+          diagnosisText: result,
+          diseaseTitle: title,
+          severity: severity,
+        );
+      }
     } catch (e, stackTrace) {
       debugPrint('[LeafDoctor] Error during pick/analysis: $e\n$stackTrace');
       if (!mounted) return;
@@ -158,6 +176,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
         actions: [
+          IconButton(
+            tooltip: 'Scan History & Archive',
+            icon: const Icon(Icons.history_rounded),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const HistoryScreen()),
+              );
+            },
+          ),
           if (_selectedImage != null || _diagnosisResult != null)
             IconButton(
               tooltip: 'Reset Scan',
